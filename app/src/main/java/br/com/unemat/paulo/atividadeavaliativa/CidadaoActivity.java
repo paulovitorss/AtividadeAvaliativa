@@ -9,6 +9,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import br.com.unemat.paulo.atividadeavaliativa.ui.auth.LoginActivity;
+
 public class CidadaoActivity extends AppCompatActivity {
     private TextView txtNomeAluno;
     private CardView cardBoletim;
@@ -70,7 +72,7 @@ public class CidadaoActivity extends AppCompatActivity {
         btnSair.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CidadaoActivity.this, MainActivity.class);
+                Intent intent = new Intent(CidadaoActivity.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();

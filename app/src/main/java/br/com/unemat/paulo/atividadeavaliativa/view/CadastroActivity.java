@@ -8,7 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import br.com.unemat.paulo.atividadeavaliativa.MainActivity;
+import br.com.unemat.paulo.atividadeavaliativa.ui.auth.LoginActivity;
 import br.com.unemat.paulo.atividadeavaliativa.R;
 import br.com.unemat.paulo.atividadeavaliativa.controller.UsuarioController;
 import br.com.unemat.paulo.atividadeavaliativa.model.Usuario;
@@ -61,7 +61,7 @@ public class CadastroActivity extends AppCompatActivity {
 
             if (resultado != -1) {
                 Toast.makeText(this, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, MainActivity.class));
+                startActivity(new Intent(this, LoginActivity.class));
                 finish();
             } else {
                 Toast.makeText(this, "Erro ao cadastrar. E-mail já pode estar em uso.", Toast.LENGTH_LONG).show();

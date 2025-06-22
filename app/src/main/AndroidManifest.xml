@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DesempenhoEscolar"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
             android:name=".BoletimActivity"
@@ -50,7 +53,7 @@
         <activity android:name=".view.AdicionarAlunoActivity" />
         <activity android:name=".view.AdicionarResponsavelActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

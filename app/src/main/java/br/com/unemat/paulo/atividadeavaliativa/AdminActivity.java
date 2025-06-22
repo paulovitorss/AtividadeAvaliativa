@@ -16,6 +16,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.Objects;
 
+import br.com.unemat.paulo.atividadeavaliativa.ui.auth.LoginActivity;
 import br.com.unemat.paulo.atividadeavaliativa.view.GerenciarAlunosActivity;
 import br.com.unemat.paulo.atividadeavaliativa.view.GerenciarFrequenciaActivity;
 import br.com.unemat.paulo.atividadeavaliativa.view.GerenciarNotasActivity;
@@ -52,7 +53,7 @@ public class AdminActivity extends AppCompatActivity {
                     startActivity(new Intent(AdminActivity.this, PerfilActivity.class));
                 } else if (id == R.id.nav_sair) {
                     // ação de logout
-                    Intent intent = new Intent(AdminActivity.this, MainActivity.class);
+                    Intent intent = new Intent(AdminActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish();
@@ -79,7 +80,7 @@ public class AdminActivity extends AppCompatActivity {
         cardRelatorios.setOnClickListener(v -> startActivity(new Intent(this, RelatoriosActivity.class)));
 
         btnSair.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminActivity.this, MainActivity.class);
+            Intent intent = new Intent(AdminActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
