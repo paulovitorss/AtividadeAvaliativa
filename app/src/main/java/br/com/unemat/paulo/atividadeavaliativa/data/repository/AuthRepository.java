@@ -1,43 +1,75 @@
 package br.com.unemat.paulo.atividadeavaliativa.data.repository;
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import br.com.unemat.paulo.atividadeavaliativa.data.model.LoginRequest;
 import br.com.unemat.paulo.atividadeavaliativa.data.model.LoginResponse;
 import br.com.unemat.paulo.atividadeavaliativa.data.remote.ApiService;
-import br.com.unemat.paulo.atividadeavaliativa.data.remote.RetrofitClient;
+import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
+/**
+ * Repositório responsável pelas operações de autenticação:
+ * <ul>
+ *   <li>delegar a chamada de login ao {@link ApiService};</li>
+ *   <li>armazenar o token JWT retornado via {@link TokenManager}.</li>
+ * </ul>
+ * <p>
+ * Escopo singleton garante que as mesmas instâncias de ApiService e TokenManager
+ * sejam reutilizadas em toda a aplicação, simplificando testes e reduzindo overhead.
+ * </p>
+ */
+@Singleton
 public class AuthRepository {
     private final ApiService apiService;
+    private final TokenManager tokenManager;
 
-    public AuthRepository(Context context) {
-        this.apiService = RetrofitClient.getClient(context).create(ApiService.class);
+    /**
+     * Injeta as dependências necessárias:
+     * <ul>
+     *   <li>{@link ApiService} gerado pelo Retrofit para chamadas de rede;</li>
+     *   <li>{@link TokenManager} para persistir e recuperar o token de acesso.</li>
+     * </ul>
+     *
+     * @param apiService   cliente Retrofit configurado em NetworkModule
+     * @param tokenManager gerenciador de token via SharedPreferences/Room
+     */
+    @Inject
+    public AuthRepository(ApiService apiService, TokenManager tokenManager) {
+        this.apiService = apiService;
+        this.tokenManager = tokenManager;
     }
 
-    public LiveData<LoginResponse> login(LoginRequest loginRequest) {
-        final MutableLiveData<LoginResponse> data = new MutableLiveData<>();
-        apiService.login(loginRequest).enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
-                if (response.isSuccessful()) {
-                    data.setValue(response.body());
-                } else {
-                    data.setValue(null);
-                }
-            }
+    /**
+     * Realiza a chamada de login para autenticar o usuário.
+     *
+     * @param loginRequest objeto contendo usuário e senha
+     * @return {@link Call} de {@link LoginResponse} para enfileirar/executar
+     * assincronamente ou de forma síncrona via .execute()
+     */
+    public Call<LoginResponse> login(LoginRequest loginRequest) {
+        return apiService.login(loginRequest);
+    }
 
-            @Override
-            public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
-                data.setValue(null);
-            }
-        });
-        return data;
+    /**
+     * Persiste o token JWT recebido após login bem-sucedido.
+     * <p>
+     * ⚠️ Atenção: usa {@code blockingAwait()} o que pode travar a thread
+     * (ex.: se chamado na UI thread).
+     * <strong>Melhor prática:</strong> expor um metodo assincrono ou
+     * retornar um {@code Completable} para compor sem bloquear.
+     * </p>
+     *
+     * @param token JWT a ser salvo
+     */
+    public void saveToken(String token) {
+        try {
+            tokenManager
+                    .saveToken(token)
+                    .blockingAwait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

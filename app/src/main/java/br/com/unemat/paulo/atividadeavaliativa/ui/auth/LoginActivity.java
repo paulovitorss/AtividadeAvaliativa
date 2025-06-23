@@ -2,7 +2,6 @@ package br.com.unemat.paulo.atividadeavaliativa.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,25 +11,41 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.UUID;
-
-import br.com.unemat.paulo.atividadeavaliativa.ui.admin.AdminActivity;
 import br.com.unemat.paulo.atividadeavaliativa.R;
-import br.com.unemat.paulo.atividadeavaliativa.security.JwtUtils;
-import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
+import br.com.unemat.paulo.atividadeavaliativa.data.model.LoginResponse;
+import br.com.unemat.paulo.atividadeavaliativa.ui.admin.AdminActivity;
 import br.com.unemat.paulo.atividadeavaliativa.ui.user.UserActivity;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import dagger.hilt.android.AndroidEntryPoint;
 
+/**
+ * Activity de autenticação:
+ * <ul>
+ *   <li>Infla o layout de login;</li>
+ *   <li>Inicializa as Views (email, senha, botão, progressbar);</li>
+ *   <li>Obtém {@link LoginViewModel} via Hilt;</li>
+ *   <li>Dispara o fluxo de login e observa {@code loginUiState};</li>
+ *   <li>Exibe feedback (Loading, Success, Error) e navega para tela correta.</li>
+ * </ul>
+ *
+ * <p><strong>Boas práticas:</strong>
+ * <ul>
+ *   <li>Substituir {@code findViewById} por ViewBinding ou DataBinding para eliminar boilerplate e NPEs.</li>
+ *   <li>Centralizar strings em {@code strings.xml} em vez de hard-code.</li>
+ *   <li>Usar Navigation Component + Safe Args para navegação tipada e gerenciamento de back stack.</li>
+ *   <li>Evitar Toasts diretos para eventos one-shot; usar padrão Event/SingleLiveEvent.</li>
+ *   <li>Tratamento de erros uniformizado (por ex. mostrar diálogos vs. toasts).</li>
+ * </ul>
+ * </p>
+ */
+@AndroidEntryPoint
 public class LoginActivity extends AppCompatActivity {
-
-    private EditText editTextEmail, editTextSenha;
-    private LoginViewModel loginViewModel;
+    private EditText editTextEmail;
+    private EditText editTextSenha;
     private Button btnEntrar;
     private ProgressBar progressBar;
-    private TokenManager tokenManager;
-    private final CompositeDisposable disposables = new CompositeDisposable();
+
+    // ViewModel injetado com Hilt
+    private LoginViewModel loginViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,81 +53,16 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         initViews();
-        tokenManager = TokenManager.getInstance(this);
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
-        btnEntrar.setOnClickListener(v -> handleLogin());
-
-        checkIfAlreadyLoggedIn();
+        btnEntrar.setOnClickListener(v -> handleLoginClick());
+        loginViewModel.loginUiState.observe(this, this::handleLoginState);
     }
 
-    private void checkIfAlreadyLoggedIn() {
-        disposables.add(tokenManager.getToken()
-                .filter(token -> !token.isEmpty())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        this::navigateToProperScreen,
-                        throwable -> Log.e("LoginActivity", "Error checking for existing token", throwable)
-                )
-        );
-    }
-
-    private void handleLogin() {
-        String username = editTextEmail.getText().toString().trim();
-        String password = editTextSenha.getText().toString().trim();
-
-        if (username.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        setLoading(true);
-
-        loginViewModel.login(username, password).observe(this, loginResponse -> {
-            if (loginResponse != null && loginResponse.getAccessToken() != null) {
-                String token = loginResponse.getAccessToken();
-
-                disposables.add(tokenManager.saveToken(token)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(() -> {
-                            setLoading(false);
-                            Toast.makeText(this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
-                            navigateToProperScreen(token);
-                        }, throwable -> {
-                            setLoading(false);
-                            Toast.makeText(this, "Erro ao salvar sessão", Toast.LENGTH_SHORT).show();
-                        })
-                );
-
-            } else {
-                setLoading(false);
-                Toast.makeText(this, "Usuário ou senha inválidos", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void navigateToProperScreen(String token) {
-        if (JwtUtils.hasRole(token, "ADMIN")) {
-            Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        } else {
-            UUID userId = JwtUtils.getUserIdFromToken(token);
-            if (userId != null) {
-                Intent intent = new Intent(LoginActivity.this, UserActivity.class);
-                intent.putExtra("USER_ID_EXTRA", userId.toString());
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Token inválido. Faça login novamente.", Toast.LENGTH_SHORT).show();
-                setLoading(false);
-            }
-        }
-        finish();
-    }
-
+    /**
+     * Inicializa referências de Views.
+     * <p><i>Melhorar:</i> usar ViewBinding para evitar chamadas manuais.</p>
+     */
     private void initViews() {
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextSenha = findViewById(R.id.editTextSenha);
@@ -120,19 +70,86 @@ public class LoginActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
     }
 
-    private void setLoading(boolean isLoading) {
-        if (isLoading) {
-            progressBar.setVisibility(View.VISIBLE);
-            btnEntrar.setEnabled(false);
-        } else {
-            progressBar.setVisibility(View.GONE);
-            btnEntrar.setEnabled(true);
+    /**
+     * Valida campos e invoca o metodo de login do ViewModel.
+     * <p><i>Atenção:</i> sempre faça trim() e valide emptiness antes de chamar a API.</p>
+     */
+    private void handleLoginClick() {
+        String username = editTextEmail.getText().toString().trim();
+        String password = editTextSenha.getText().toString().trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, getString(R.string.msg_preencha_campos), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        loginViewModel.login(username, password);
+    }
+
+    /**
+     * Lida com os estados emitidos por {@link LoginViewModel.LoginUiState}:
+     * <ul>
+     *   <li>Loading: mostra ProgressBar e desabilita botão;</li>
+     *   <li>Success: oculta ProgressBar, exibe Toast e navega;</li>
+     *   <li>Error: oculta ProgressBar e exibe mensagem de erro.</li>
+     * </ul>
+     *
+     * @param state estado atual da UI de login
+     */
+    private void handleLoginState(LoginViewModel.LoginUiState state) {
+        if (state instanceof LoginViewModel.LoginUiState.Loading) {
+            setLoading(true);
+
+        } else if (state instanceof LoginViewModel.LoginUiState.Success) {
+            setLoading(false);
+            Toast.makeText(this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
+
+            LoginResponse loginData = ((LoginViewModel.LoginUiState.Success) state).data;
+            navigateToProperScreen(loginData);
+
+        } else if (state instanceof LoginViewModel.LoginUiState.Error) {
+            setLoading(false);
+            String errorMessage = ((LoginViewModel.LoginUiState.Error) state).message;
+            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disposables.clear();
+    /**
+     * Atualiza visibilidade de ProgressBar e habilita/desabilita botão.
+     *
+     * @param isLoading indica se estamos em carregamento
+     */
+    private void setLoading(boolean isLoading) {
+        progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        btnEntrar.setEnabled(!isLoading);
+    }
+
+    /**
+     * Decide para qual Activity navegar com base no papel do usuário:
+     * <ul>
+     *   <li>ADMIN ou TEACHER → {@link AdminActivity};</li>
+     *   <li>outros → {@link UserActivity} (passando USER_ID_EXTRA).</li>
+     * </ul>
+     * <p>
+     * Usa flags para limpar a pilha de Activities e evitar voltar ao login.
+     * </p>
+     *
+     * @param loginData resposta de login contendo roles e userId
+     */
+    private void navigateToProperScreen(LoginResponse loginData) {
+        Intent intent;
+        String role = loginData.getMainRole();
+        String userId = loginData.getUserId();
+
+        if ("ADMIN".equals(role) || "TEACHER".equals(role)) {
+            intent = new Intent(this, AdminActivity.class);
+        } else {
+            intent = new Intent(this, UserActivity.class);
+            intent.putExtra("USER_ID_EXTRA", userId);
+        }
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

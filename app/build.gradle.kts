@@ -1,5 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.baselineprofile)
 }
 
 android {
@@ -29,6 +33,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 dependencies {
@@ -36,6 +43,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.profileinstaller)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -53,4 +61,6 @@ dependencies {
     implementation(libs.rxjava3.android)
     implementation(libs.auth0.jwtdecode)
     implementation(libs.androidx.cardview)
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
 }
