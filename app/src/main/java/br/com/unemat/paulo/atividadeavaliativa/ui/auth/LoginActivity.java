@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.UUID;
 
+import br.com.unemat.paulo.atividadeavaliativa.AdminActivity;
 import br.com.unemat.paulo.atividadeavaliativa.R;
 import br.com.unemat.paulo.atividadeavaliativa.security.JwtUtils;
 import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
@@ -47,16 +48,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private void checkIfAlreadyLoggedIn() {
         disposables.add(tokenManager.getToken()
+                .filter(token -> !token.isEmpty())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(token -> {
-                    if (token != null && !token.isEmpty()) {
-                        UUID userId = JwtUtils.getUserIdFromToken(token);
-                        if (userId != null) {
-                            navigateToMainScreen(userId);
-                        }
-                    }
-                }, throwable -> Log.e("LoginActivity", "Error checking for existing token", throwable))
+                .subscribe(
+                        this::navigateToProperScreen,
+                        throwable -> Log.e("LoginActivity", "Error checking for existing token", throwable)
+                )
         );
     }
 
@@ -75,20 +73,13 @@ public class LoginActivity extends AppCompatActivity {
             if (loginResponse != null && loginResponse.getAccessToken() != null) {
                 String token = loginResponse.getAccessToken();
 
-                UUID userId = JwtUtils.getUserIdFromToken(token);
-                if (userId == null) {
-                    setLoading(false);
-                    Toast.makeText(this, "Erro ao processar token de autenticação.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
                 disposables.add(tokenManager.saveToken(token)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {
                             setLoading(false);
                             Toast.makeText(this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
-                            navigateToMainScreen(userId);
+                            navigateToProperScreen(token);
                         }, throwable -> {
                             setLoading(false);
                             Toast.makeText(this, "Erro ao salvar sessão", Toast.LENGTH_SHORT).show();
@@ -102,16 +93,27 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void navigateToMainScreen(UUID userId) {
-        Intent intent = new Intent(LoginActivity.this, UserActivity.class);
-        intent.putExtra("USER_ID_EXTRA", userId.toString());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+    private void navigateToProperScreen(String token) {
+        if (JwtUtils.hasRole(token, "ADMIN")) {
+            Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        } else {
+            UUID userId = JwtUtils.getUserIdFromToken(token);
+            if (userId != null) {
+                Intent intent = new Intent(LoginActivity.this, UserActivity.class);
+                intent.putExtra("USER_ID_EXTRA", userId.toString());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Token inválido. Faça login novamente.", Toast.LENGTH_SHORT).show();
+                setLoading(false);
+            }
+        }
         finish();
     }
 
     private void initViews() {
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextSenha = findViewById(R.id.editTextSenha);
         btnEntrar = findViewById(R.id.btnEntrar);
