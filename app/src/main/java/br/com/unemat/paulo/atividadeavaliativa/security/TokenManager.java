@@ -57,13 +57,4 @@ public class TokenManager {
     public Completable clearToken() {
         return saveToken(null);
     }
-
-    public String getTokenSync() {
-        try {
-            return getToken().blockingGet();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
 }

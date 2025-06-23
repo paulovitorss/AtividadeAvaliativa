@@ -1,12 +1,15 @@
 package br.com.unemat.paulo.atividadeavaliativa.data.model;
 
-import java.util.UUID;
+import com.google.gson.annotations.SerializedName;
 
 public class Role {
-    private UUID roleId;
+    @SerializedName("role_id")
+    private Long roleId;
+
+    @SerializedName("name")
     private String name;
 
-    public UUID getRoleId() {
+    public Long getRoleId() {
         return roleId;
     }
 

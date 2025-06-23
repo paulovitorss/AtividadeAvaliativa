@@ -2,7 +2,6 @@ package br.com.unemat.paulo.atividadeavaliativa.ui.user;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,13 +15,14 @@ import java.util.UUID;
 import br.com.unemat.paulo.atividadeavaliativa.R;
 import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
 import br.com.unemat.paulo.atividadeavaliativa.ui.auth.LoginActivity;
+import br.com.unemat.paulo.atividadeavaliativa.ui.grade.GradeActivity;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class UserActivity extends AppCompatActivity {
     private TextView txtNomeAluno;
-    private CardView cardBoletim, cardFrequencia, cardDesempenho, cardComunicados;
+    private CardView cardBoletim;
     private Button btnSair;
     private UserViewModel userViewModel;
     private TokenManager tokenManager;
@@ -44,7 +44,9 @@ public class UserActivity extends AppCompatActivity {
             try {
                 userId = UUID.fromString(userIdString);
             } catch (IllegalArgumentException e) {
-                Log.e("UserActivity", "ID recebido do Intent é inválido: " + userIdString, e);
+                Toast.makeText(this, "Erro: ID de usuário inválido.", Toast.LENGTH_LONG).show();
+                logout();
+                return;
             }
         }
 
@@ -61,9 +63,9 @@ public class UserActivity extends AppCompatActivity {
     private void initViews() {
         txtNomeAluno = findViewById(R.id.txtNomeAluno);
         cardBoletim = findViewById(R.id.cardBoletim);
-        cardFrequencia = findViewById(R.id.cardFrequencia);
-        cardDesempenho = findViewById(R.id.cardDesempenho);
-        cardComunicados = findViewById(R.id.cardComunicados);
+        CardView cardFrequencia = findViewById(R.id.cardFrequencia);
+        CardView cardDesempenho = findViewById(R.id.cardDesempenho);
+        CardView cardComunicados = findViewById(R.id.cardComunicados);
         btnSair = findViewById(R.id.btnSair);
     }
 
@@ -80,6 +82,11 @@ public class UserActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnSair.setOnClickListener(v -> logout());
+
+        cardBoletim.setOnClickListener(v -> {
+            Intent intent = new Intent(UserActivity.this, GradeActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void logout() {
@@ -88,10 +95,7 @@ public class UserActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         this::navigateToLoginScreen,
-                        throwable -> {
-                            Log.e("UserActivity", "Error clearing token, logging out anyway.", throwable);
-                            navigateToLoginScreen();
-                        }
+                        throwable -> navigateToLoginScreen()
                 )
         );
     }

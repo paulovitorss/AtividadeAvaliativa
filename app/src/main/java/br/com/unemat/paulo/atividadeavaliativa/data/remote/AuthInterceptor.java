@@ -20,8 +20,8 @@ public class AuthInterceptor implements Interceptor {
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request.Builder requestBuilder = chain.request().newBuilder();
+        String token = tokenManager.getToken().blockingGet();
 
-        String token = tokenManager.getTokenSync();
         if (token != null && !token.isEmpty()) {
             requestBuilder.addHeader("Authorization", "Bearer " + token);
         }
