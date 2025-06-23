@@ -44,7 +44,7 @@
             android:name=".ui.user.UserActivity"
             android:exported="false" />
         <activity
-            android:name=".AdminActivity"
+            android:name=".ui.admin.AdminActivity"
             android:exported="false" />
         <activity
             android:name=".view.CadastroActivity"

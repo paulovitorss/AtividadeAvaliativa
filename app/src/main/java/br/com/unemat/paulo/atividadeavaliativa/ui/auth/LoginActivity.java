@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.UUID;
 
-import br.com.unemat.paulo.atividadeavaliativa.AdminActivity;
+import br.com.unemat.paulo.atividadeavaliativa.ui.admin.AdminActivity;
 import br.com.unemat.paulo.atividadeavaliativa.R;
 import br.com.unemat.paulo.atividadeavaliativa.security.JwtUtils;
 import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
