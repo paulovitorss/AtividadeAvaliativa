@@ -1,5 +1,7 @@
 package br.com.unemat.paulo.atividadeavaliativa.data.repository;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -15,13 +17,13 @@ import retrofit2.Response;
 public class AuthRepository {
     private final ApiService apiService;
 
-    public AuthRepository() {
-        this.apiService = RetrofitClient.getClient().create(ApiService.class);
+    public AuthRepository(Context context) {
+        this.apiService = RetrofitClient.getClient(context).create(ApiService.class);
     }
 
     public LiveData<LoginResponse> login(LoginRequest loginRequest) {
         final MutableLiveData<LoginResponse> data = new MutableLiveData<>();
-        apiService.login(loginRequest).enqueue(new Callback<>() {
+        apiService.login(loginRequest).enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
@@ -36,7 +38,6 @@ public class AuthRepository {
                 data.setValue(null);
             }
         });
-
         return data;
     }
 }

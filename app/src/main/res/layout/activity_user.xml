@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
     android:fitsSystemWindows="true"
-    tools:context=".CidadaoActivity">
+    tools:context=".ui.user.UserActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

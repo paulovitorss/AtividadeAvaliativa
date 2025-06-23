@@ -41,7 +41,7 @@
             android:name=".RelatoriosActivity"
             android:exported="false" />
         <activity
-            android:name=".CidadaoActivity"
+            android:name=".ui.user.UserActivity"
             android:exported="false" />
         <activity
             android:name=".AdminActivity"

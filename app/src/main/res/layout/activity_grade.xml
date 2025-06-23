@@ -8,9 +8,10 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.grade.GradeActivity">
 
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,6 +28,7 @@
             android:textStyle="bold" />
     </androidx.appcompat.widget.Toolbar>
 
+    <!-- CardView do Cabeçalho -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewHeader"
         android:layout_width="0dp"
@@ -44,6 +46,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Linha do Spinner -->
             <LinearLayout
                 android:id="@+id/containerSpinner"
                 android:layout_width="match_parent"
@@ -67,54 +70,57 @@
                     android:paddingEnd="8dp" />
             </LinearLayout>
 
+            <!-- Linha do Header Dinâmico -->
             <LinearLayout
+                android:id="@+id/headerRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
 
+                <!-- Coluna fixa: Disciplina -->
                 <TextView
+                    android:id="@+id/tvDisciplinaHeader"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:text="@string/label_disciplina2"
                     android:textColor="@color/colorPrimaryText"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/text_size_header"
                     android:textStyle="bold" />
 
-                <TextView
+                <!-- Container rolável para colunas de Nota X -->
+                <HorizontalScrollView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Nota 1"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:layout_weight="3"
+                    android:overScrollMode="never">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Nota 2"
-                    android:textColor="@color/colorPrimaryText"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    <LinearLayout
+                        android:id="@+id/llHeaderGrades"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
 
+                <!-- Coluna fixa: Média -->
                 <TextView
+                    android:id="@+id/tvMediaHeader"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="@string/label_media2"
                     android:textColor="@color/colorPrimaryText"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/text_size_header"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewNotas"
         android:layout_width="0dp"
@@ -128,6 +134,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardViewHeader" />
 
+    <!-- Botão Voltar -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnVoltar"
         style="@style/Widget.Material3.Button"

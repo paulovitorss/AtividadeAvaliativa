@@ -1,18 +1,22 @@
 package br.com.unemat.paulo.atividadeavaliativa.ui.auth;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModel;
 
 import br.com.unemat.paulo.atividadeavaliativa.data.model.LoginRequest;
 import br.com.unemat.paulo.atividadeavaliativa.data.model.LoginResponse;
 import br.com.unemat.paulo.atividadeavaliativa.data.repository.AuthRepository;
 
-public class LoginViewModel extends ViewModel {
+public class LoginViewModel extends AndroidViewModel {
 
     private final AuthRepository authRepository;
 
-    public LoginViewModel() {
-        this.authRepository = new AuthRepository();
+    public LoginViewModel(@NonNull Application application) {
+        super(application);
+        this.authRepository = new AuthRepository(application.getApplicationContext());
     }
 
     public LiveData<LoginResponse> login(String username, String password) {

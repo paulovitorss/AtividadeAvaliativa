@@ -52,4 +52,5 @@ dependencies {
     implementation(libs.rxjava3.java)
     implementation(libs.rxjava3.android)
     implementation(libs.auth0.jwtdecode)
+    implementation(libs.androidx.cardview)
 }

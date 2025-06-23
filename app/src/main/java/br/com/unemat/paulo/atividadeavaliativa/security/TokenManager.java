@@ -34,29 +34,28 @@ public class TokenManager {
     }
 
     public Completable saveToken(String token) {
-        if (token == null || token.trim().isEmpty()) {
-            return clearToken();
-        }
-
         return dataStore.updateDataAsync(prefsIn -> {
             MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
-            mutablePreferences.set(TOKEN_KEY, token);
+            if (token == null || token.trim().isEmpty()) {
+                mutablePreferences.remove(TOKEN_KEY);
+            } else {
+                mutablePreferences.set(TOKEN_KEY, token);
+            }
             return Single.just(mutablePreferences);
         }).ignoreElement();
     }
 
     public Single<String> getToken() {
         return dataStore.data()
-                .map(prefs -> prefs.get(TOKEN_KEY))
+                .map(prefs -> {
+                    String token = prefs.get(TOKEN_KEY);
+                    return token == null ? "" : token;
+                })
                 .first("");
     }
 
     public Completable clearToken() {
-        return dataStore.updateDataAsync(prefsIn -> {
-            MutablePreferences mutablePreferences = prefsIn.toMutablePreferences();
-            mutablePreferences.remove(TOKEN_KEY);
-            return Single.just(mutablePreferences);
-        }).ignoreElement();
+        return saveToken(null);
     }
 
     public String getTokenSync() {

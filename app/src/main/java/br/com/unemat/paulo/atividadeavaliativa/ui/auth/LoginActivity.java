@@ -2,6 +2,7 @@ package br.com.unemat.paulo.atividadeavaliativa.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,9 +12,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import br.com.unemat.paulo.atividadeavaliativa.CidadaoActivity;
+import java.util.UUID;
+
 import br.com.unemat.paulo.atividadeavaliativa.R;
+import br.com.unemat.paulo.atividadeavaliativa.security.JwtUtils;
 import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
+import br.com.unemat.paulo.atividadeavaliativa.ui.user.UserActivity;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -25,7 +29,6 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnEntrar;
     private ProgressBar progressBar;
     private TokenManager tokenManager;
-
     private final CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
@@ -33,14 +36,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-
+        initViews();
         tokenManager = TokenManager.getInstance(this);
-
-        editTextEmail = findViewById(R.id.editTextEmail);
-        editTextSenha = findViewById(R.id.editTextSenha);
-        btnEntrar = findViewById(R.id.btnEntrar);
-        progressBar = findViewById(R.id.progressBar);
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
         btnEntrar.setOnClickListener(v -> handleLogin());
 
@@ -53,11 +51,12 @@ public class LoginActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(token -> {
                     if (token != null && !token.isEmpty()) {
-                        navigateToMainScreen();
+                        UUID userId = JwtUtils.getUserIdFromToken(token);
+                        if (userId != null) {
+                            navigateToMainScreen(userId);
+                        }
                     }
-                }, throwable -> {
-                    Toast.makeText(this, "Erro ao verificar sessão", Toast.LENGTH_SHORT).show();
-                })
+                }, throwable -> Log.e("LoginActivity", "Error checking for existing token", throwable))
         );
     }
 
@@ -74,14 +73,22 @@ public class LoginActivity extends AppCompatActivity {
 
         loginViewModel.login(username, password).observe(this, loginResponse -> {
             if (loginResponse != null && loginResponse.getAccessToken() != null) {
-                Toast.makeText(this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
+                String token = loginResponse.getAccessToken();
 
-                disposables.add(tokenManager.saveToken(loginResponse.getAccessToken())
+                UUID userId = JwtUtils.getUserIdFromToken(token);
+                if (userId == null) {
+                    setLoading(false);
+                    Toast.makeText(this, "Erro ao processar token de autenticação.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                disposables.add(tokenManager.saveToken(token)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {
                             setLoading(false);
-                            navigateToMainScreen();
+                            Toast.makeText(this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
+                            navigateToMainScreen(userId);
                         }, throwable -> {
                             setLoading(false);
                             Toast.makeText(this, "Erro ao salvar sessão", Toast.LENGTH_SHORT).show();
@@ -95,11 +102,20 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void navigateToMainScreen() {
-        Intent intent = new Intent(LoginActivity.this, CidadaoActivity.class);
+    private void navigateToMainScreen(UUID userId) {
+        Intent intent = new Intent(LoginActivity.this, UserActivity.class);
+        intent.putExtra("USER_ID_EXTRA", userId.toString());
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void initViews() {
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        editTextEmail = findViewById(R.id.editTextEmail);
+        editTextSenha = findViewById(R.id.editTextSenha);
+        btnEntrar = findViewById(R.id.btnEntrar);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     private void setLoading(boolean isLoading) {
