@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import br.com.unemat.paulo.atividadeavaliativa.ui.auth.LoginActivity;
+import br.com.unemat.paulo.atividadeavaliativa.ui.grade.GradeActivity;
 
 public class CidadaoActivity extends AppCompatActivity {
     private TextView txtNomeAluno;
@@ -39,7 +40,7 @@ public class CidadaoActivity extends AppCompatActivity {
         cardBoletim.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CidadaoActivity.this, BoletimActivity.class);
+                Intent intent = new Intent(CidadaoActivity.this, GradeActivity.class);
                 startActivity(intent);
             }
         });

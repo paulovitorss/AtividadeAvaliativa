@@ -51,4 +51,5 @@ dependencies {
     implementation(libs.datastore.preferences.rxjava3)
     implementation(libs.rxjava3.java)
     implementation(libs.rxjava3.android)
+    implementation(libs.auth0.jwtdecode)
 }

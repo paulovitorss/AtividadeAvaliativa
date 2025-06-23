@@ -14,7 +14,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".BoletimActivity"
+            android:name=".ui.grade.GradeActivity"
             android:exported="false" />
         <activity
             android:name=".FrequenciaActivity"

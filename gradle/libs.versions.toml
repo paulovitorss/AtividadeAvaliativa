@@ -14,7 +14,7 @@ securityCrypto = "1.1.0-beta01"
 datastore = "1.1.7"
 rxjava3 = "3.1.8"
 rxandroid = "3.0.2"
-
+auth0-jwt = "2.0.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -33,7 +33,7 @@ security-crypto = { group = "androidx.security", name = "security-crypto", versi
 datastore-preferences-rxjava3 = { group = "androidx.datastore", name = "datastore-preferences-rxjava3", version.ref = "datastore" }
 rxjava3-java = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxjava3" }
 rxjava3-android = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxandroid" }
-
+auth0-jwtdecode = { module = "com.auth0.android:jwtdecode", version.ref = "auth0-jwt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

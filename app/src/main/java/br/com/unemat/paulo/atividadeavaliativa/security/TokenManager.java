@@ -58,4 +58,13 @@ public class TokenManager {
             return Single.just(mutablePreferences);
         }).ignoreElement();
     }
+
+    public String getTokenSync() {
+        try {
+            return getToken().blockingGet();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }
