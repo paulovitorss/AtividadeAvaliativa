@@ -1,44 +1,42 @@
 package br.com.unemat.paulo.atividadeavaliativa.data.repository;
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
 import java.util.UUID;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import br.com.unemat.paulo.atividadeavaliativa.data.model.User;
 import br.com.unemat.paulo.atividadeavaliativa.data.remote.ApiService;
-import br.com.unemat.paulo.atividadeavaliativa.data.remote.RetrofitClient;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
+/**
+ * Repositório responsável por buscar dados de Usuários (Users).
+ * Gerenciado pelo Hilt como um Singleton para garantir uma única instância na aplicação.
+ */
+@Singleton
 public class UserRepository {
-    private final ApiService api;
+    private final ApiService apiService;
 
-    public UserRepository(Context ctx) {
-        this.api = RetrofitClient.getClient(ctx).create(ApiService.class);
+    /**
+     * Construtor para injeção de dependência via Hilt.
+     * Hilt proverá a instância do ApiService que foi definida no NetworkModule.
+     *
+     * @param apiService A implementação da nossa interface de API.
+     */
+    @Inject
+    public UserRepository(ApiService apiService) {
+        this.apiService = apiService;
     }
 
-    public LiveData<User> getUser(UUID userId) {
-        MutableLiveData<User> live = new MutableLiveData<>();
-        api.getUserById(userId).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> resp) {
-                if (resp.isSuccessful()) {
-                    live.setValue(resp.body());
-                } else {
-                    live.setValue(null);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
-                live.setValue(null);
-            }
-        });
-        return live;
+    /**
+     * Prepara a chamada de rede para buscar um usuário específico pelo seu ID.
+     * Este metodo retorna o objeto Call, permitindo que a camada que o chama (ViewModel)
+     * decida como e quando executar a chamada de forma assíncrona.
+     *
+     * @param userId O UUID do usuário a ser buscado.
+     * @return Um objeto Call do Retrofit, pronto para ser executado com .enqueue().
+     */
+    public Call<User> getUser(UUID userId) {
+        return apiService.getUserById(userId);
     }
 }

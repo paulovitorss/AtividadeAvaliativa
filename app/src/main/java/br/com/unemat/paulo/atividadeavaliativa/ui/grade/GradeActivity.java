@@ -2,13 +2,12 @@ package br.com.unemat.paulo.atividadeavaliativa.ui.grade;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,83 +28,95 @@ import java.util.UUID;
 import br.com.unemat.paulo.atividadeavaliativa.R;
 import br.com.unemat.paulo.atividadeavaliativa.data.model.Grade;
 import br.com.unemat.paulo.atividadeavaliativa.data.model.SubjectGrade;
-import br.com.unemat.paulo.atividadeavaliativa.security.JwtUtils;
-import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
 import br.com.unemat.paulo.atividadeavaliativa.ui.auth.LoginActivity;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class GradeActivity extends AppCompatActivity {
-    private final CompositeDisposable disposables = new CompositeDisposable();
+
     private SubjectGradeAdapter subjectGradeAdapter;
     private List<Grade> allGrades = new ArrayList<>();
     private LinearLayout llHeaderGrades;
+    private Spinner spinnerTerm;
+    private RecyclerView rvNotas;
+    private ProgressBar progressBar;
+
+    private GradeViewModel gradeViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grade);
 
-        Spinner spinnerTerm = findViewById(R.id.spinnerTerm);
-        RecyclerView rvNotas = findViewById(R.id.recyclerViewNotas);
-        llHeaderGrades = findViewById(R.id.llHeaderGrades);
-        Button btnVoltar = findViewById(R.id.btnVoltar);
+        initViews();
 
+        gradeViewModel = new ViewModelProvider(this).get(GradeViewModel.class);
+
+        // A Activity agora recebe o ID do estudante da tela anterior.
+        String userIdString = getIntent().getStringExtra("USER_ID_EXTRA");
+        if (userIdString == null || userIdString.isEmpty()) {
+            handleInvalidSession("ID do estudante não fornecido.");
+            return;
+        }
+
+        UUID studentId;
+        try {
+            studentId = UUID.fromString(userIdString);
+        } catch (IllegalArgumentException e) {
+            handleInvalidSession("ID do estudante inválido.");
+            return;
+        }
+
+        setupRecyclerView();
+        observeGradeState();
+
+        // Inicia a busca pelos dados
+        gradeViewModel.fetchGrades(studentId);
+
+        findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
+    }
+
+    private void initViews() {
+        spinnerTerm = findViewById(R.id.spinnerTerm);
+        rvNotas = findViewById(R.id.recyclerViewNotas);
+        llHeaderGrades = findViewById(R.id.llHeaderGrades);
+        progressBar = findViewById(R.id.progressBar); // Assumindo que você tenha um progressBar no XML
+    }
+
+    private void setupRecyclerView() {
         subjectGradeAdapter = new SubjectGradeAdapter();
         rvNotas.setLayoutManager(new LinearLayoutManager(this));
         rvNotas.setAdapter(subjectGradeAdapter);
-
-        TokenManager tm = TokenManager.getInstance(this);
-        GradeViewModel vm = new ViewModelProvider(this).get(GradeViewModel.class);
-
-        disposables.add(tm.getToken()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(token -> {
-                    if (token.isEmpty()) {
-                        handleInvalidSession();
-                        return;
-                    }
-
-                    UUID studentId = JwtUtils.getUserIdFromToken(token);
-                    if (studentId == null) {
-                        handleInvalidSession();
-                        return;
-                    }
-
-                    vm.getGrades(studentId).observe(this, grades -> {
-                        if (grades == null || grades.isEmpty()) {
-                            Toast.makeText(this, "Nenhuma nota encontrada", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        allGrades = grades;
-                        setupSpinner(spinnerTerm, grades);
-                    });
-
-                }, throwable -> {
-                    Log.e("GradeActivity", "Falha ao obter token", throwable);
-                    handleInvalidSession();
-                })
-        );
-
-        btnVoltar.setOnClickListener(v -> finish());
     }
 
-    private void handleInvalidSession() {
-        Toast.makeText(this, "Sessão inválida. Por favor, faça login novamente.", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(this, LoginActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-        finish();
+    private void observeGradeState() {
+        gradeViewModel.gradeUiState.observe(this, state -> {
+            setLoading(state instanceof GradeViewModel.GradeUiState.Loading);
+
+            if (state instanceof GradeViewModel.GradeUiState.Success) {
+                List<Grade> grades = ((GradeViewModel.GradeUiState.Success) state).grades;
+                if (grades.isEmpty()) {
+                    Toast.makeText(this, "Nenhuma nota encontrada", Toast.LENGTH_SHORT).show();
+                } else {
+                    allGrades = grades;
+                    setupSpinner(grades);
+                }
+            } else if (state instanceof GradeViewModel.GradeUiState.Error) {
+                String message = ((GradeViewModel.GradeUiState.Error) state).message;
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        disposables.clear();
+    private void setLoading(boolean isLoading) {
+        if (progressBar != null) {
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        }
+        spinnerTerm.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        rvNotas.setVisibility(isLoading ? View.GONE : View.VISIBLE);
     }
 
-    private void setupSpinner(Spinner spinner, List<Grade> grades) {
+    private void setupSpinner(List<Grade> grades) {
         TreeSet<Integer> terms = new TreeSet<>();
         for (Grade g : grades) terms.add(g.getTerm());
 
@@ -118,9 +129,9 @@ public class GradeActivity extends AppCompatActivity {
                 this, android.R.layout.simple_spinner_item, labels
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        spinnerTerm.setAdapter(adapter);
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinnerTerm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
@@ -132,7 +143,9 @@ public class GradeActivity extends AppCompatActivity {
             }
         });
 
-        spinner.setSelection(0);
+        if (!terms.isEmpty()) {
+            spinnerTerm.setSelection(0);
+        }
     }
 
     private void onTermSelected(int term) {
@@ -140,9 +153,7 @@ public class GradeActivity extends AppCompatActivity {
         for (Grade g : allGrades) {
             if (g.getTerm() == term) filtered.add(g);
         }
-
         setupHeader(filtered);
-
         List<SubjectGrade> list = new ArrayList<>();
         Map<String, List<BigDecimal>> map = new LinkedHashMap<>();
         for (Grade g : filtered) {
@@ -165,7 +176,6 @@ public class GradeActivity extends AppCompatActivity {
         for (List<BigDecimal> l : map.values()) {
             if (l.size() > maxNotas) maxNotas = l.size();
         }
-
         llHeaderGrades.removeAllViews();
         for (int i = 1; i <= maxNotas; i++) {
             TextView tv = new TextView(this);
@@ -178,5 +188,12 @@ public class GradeActivity extends AppCompatActivity {
             ));
             llHeaderGrades.addView(tv);
         }
+    }
+
+    private void handleInvalidSession(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, LoginActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+        finish();
     }
 }

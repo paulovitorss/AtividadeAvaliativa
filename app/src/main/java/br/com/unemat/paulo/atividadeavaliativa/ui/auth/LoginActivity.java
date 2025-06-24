@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void navigateToProperScreen(LoginResponse loginData) {
         Intent intent;
-        String role = loginData.getMainRole();
+        String role = loginData.getRole();
         String userId = loginData.getUserId();
 
         if ("ADMIN".equals(role) || "TEACHER".equals(role)) {

@@ -1,46 +1,43 @@
 package br.com.unemat.paulo.atividadeavaliativa.data.repository;
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
 import java.util.List;
 import java.util.UUID;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import br.com.unemat.paulo.atividadeavaliativa.data.model.Grade;
 import br.com.unemat.paulo.atividadeavaliativa.data.remote.ApiService;
-import br.com.unemat.paulo.atividadeavaliativa.data.remote.RetrofitClient;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
+/**
+ * Repositório responsável por buscar dados de Notas (Grades).
+ * Gerenciado pelo Hilt como um Singleton.
+ */
+@Singleton
 public class GradeRepository {
     private final ApiService apiService;
 
-    public GradeRepository(Context context) {
-        this.apiService = RetrofitClient.getClient(context).create(ApiService.class);
+    /**
+     * Construtor para injeção de dependência via Hilt.
+     * Recebe a instância do ApiService, que é provida pelo NetworkModule.
+     *
+     * @param apiService A implementação da nossa interface de API.
+     */
+    @Inject
+    public GradeRepository(ApiService apiService) {
+        this.apiService = apiService;
     }
 
-    public LiveData<List<Grade>> getGrades(UUID studentId) {
-        final MutableLiveData<List<Grade>> data = new MutableLiveData<>();
-
-        apiService.getGrades(studentId).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Grade>> call, @NonNull Response<List<Grade>> response) {
-                if (response.isSuccessful()) {
-                    data.setValue(response.body());
-                } else {
-                    data.setValue(null);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<Grade>> call, @NonNull Throwable t) {
-                data.setValue(null);
-            }
-        });
-        return data;
+    /**
+     * Busca a lista de notas para um estudante específico.
+     * Este metodo não executa a chamada, apenas a prepara e a retorna.
+     * A execução (com .enqueue()) é responsabilidade do ViewModel.
+     *
+     * @param studentId O UUID do estudante.
+     * @return Um objeto Call do Retrofit, pronto para ser executado.
+     */
+    public Call<List<Grade>> getGrades(UUID studentId) {
+        return apiService.getGrades(studentId);
     }
 }

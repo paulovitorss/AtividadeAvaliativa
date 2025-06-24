@@ -6,8 +6,8 @@ public class LoginResponse {
     @SerializedName("userId")
     private String userId;
 
-    @SerializedName("mainRole")
-    private String mainRole;
+    @SerializedName("role")
+    private String role;
 
     @SerializedName("accessToken")
     private String accessToken;
@@ -19,8 +19,8 @@ public class LoginResponse {
         return userId;
     }
 
-    public String getMainRole() {
-        return mainRole;
+    public String getRole() {
+        return role;
     }
 
     public String getAccessToken() {
