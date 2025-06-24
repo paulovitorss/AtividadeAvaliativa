@@ -79,4 +79,5 @@
     <string name="label_nota_1">"Nota 1: "</string>
     <string name="label_nota_2">"Nota 2: "</string>
     <string name="msg_preencha_campos">Preencha todos os campos</string>
+    <string name="perfil">Perfil</string>
 </resources>

@@ -21,8 +21,8 @@ public interface ApiService {
     @POST("/api/v1/login")
     Call<LoginResponse> login(@Body LoginRequest loginRequest);
 
-    @GET("/api/v1/users/{userId}")
-    Call<User> getUserById(@Path("userId") UUID userId);
+    @GET("/api/v1/profile")
+    Call<User> getMyProfile();
 
     @GET("/api/v1/grades/student/{studentId}")
     Call<List<Grade>> getGrades(@Path("studentId") UUID studentId);

@@ -1,10 +1,9 @@
 package br.com.unemat.paulo.atividadeavaliativa.ui.user;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
-import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -42,16 +41,15 @@ public class UserViewModel extends ViewModel {
     /**
      * Busca os dados de um usuário específico de forma assíncrona.
      *
-     * @param userId O UUID do usuário a ser buscado.
      */
-    public void fetchUserById(UUID userId) {
+    public void fetchMyProfile() {
         // Emite o estado de Loading para a UI.
         _userUiState.setValue(new UserUiState.Loading());
 
         // Usa o repositório para obter a chamada e a executa em background.
-        userRepository.getUser(userId).enqueue(new Callback<User>() {
+        userRepository.getMyProfile().enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     // Em caso de sucesso, emite o estado de Success com os dados do usuário.
                     _userUiState.postValue(new UserUiState.Success(response.body()));
@@ -62,7 +60,7 @@ public class UserViewModel extends ViewModel {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 // Em caso de falha de rede, emite um erro.
                 _userUiState.postValue(new UserUiState.Error("Falha de conexão: " + t.getMessage()));
             }

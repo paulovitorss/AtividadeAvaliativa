@@ -2,7 +2,6 @@ package br.com.unemat.paulo.atividadeavaliativa.ui.admin;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -14,7 +13,10 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.Objects;
 
+import br.com.unemat.paulo.atividadeavaliativa.EnviarComunicadosActivity;
+import br.com.unemat.paulo.atividadeavaliativa.PerfilActivity;
 import br.com.unemat.paulo.atividadeavaliativa.R;
+import br.com.unemat.paulo.atividadeavaliativa.RelatoriosActivity;
 import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
 import br.com.unemat.paulo.atividadeavaliativa.ui.auth.LoginActivity;
 import br.com.unemat.paulo.atividadeavaliativa.view.GerenciarAlunosActivity;
@@ -50,7 +52,7 @@ public class AdminActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.nav_perfil) {
-                // startActivity(new Intent(AdminActivity.this, PerfilActivity.class));
+                startActivity(new Intent(AdminActivity.this, PerfilActivity.class));
             } else if (id == R.id.nav_sair) {
                 logout();
             }
@@ -62,17 +64,14 @@ public class AdminActivity extends AppCompatActivity {
         CardView cardGerenciarAlunos = findViewById(R.id.cardGerenciarAlunos);
         CardView cardGerenciarNotas = findViewById(R.id.cardGerenciarNotas);
         CardView cardGerenciarFrequencia = findViewById(R.id.cardGerenciarFrequencia);
-        // CardView cardEnviarComunicados = findViewById(R.id.cardEnviarComunicados);
-        // CardView cardRelatorios = findViewById(R.id.cardRelatorios);
-        Button btnSair = findViewById(R.id.btnSair);
+        CardView cardEnviarComunicados = findViewById(R.id.cardEnviarComunicados);
+        CardView cardRelatorios = findViewById(R.id.cardRelatorios);
 
         cardGerenciarAlunos.setOnClickListener(v -> startActivity(new Intent(this, GerenciarAlunosActivity.class)));
         cardGerenciarNotas.setOnClickListener(v -> startActivity(new Intent(this, GerenciarNotasActivity.class)));
         cardGerenciarFrequencia.setOnClickListener(v -> startActivity(new Intent(this, GerenciarFrequenciaActivity.class)));
-        // cardEnviarComunicados.setOnClickListener(v -> startActivity(new Intent(this, EnviarComunicadosActivity.class)));
-        // cardRelatorios.setOnClickListener(v -> startActivity(new Intent(this, RelatoriosActivity.class)));
-
-        btnSair.setOnClickListener(v -> logout());
+        cardEnviarComunicados.setOnClickListener(v -> startActivity(new Intent(this, EnviarComunicadosActivity.class)));
+        cardRelatorios.setOnClickListener(v -> startActivity(new Intent(this, RelatoriosActivity.class)));
     }
 
     private void logout() {

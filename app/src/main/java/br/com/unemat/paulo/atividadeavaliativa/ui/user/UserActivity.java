@@ -12,8 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.UUID;
-
 import br.com.unemat.paulo.atividadeavaliativa.R;
 import br.com.unemat.paulo.atividadeavaliativa.data.model.User;
 import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
@@ -34,12 +32,12 @@ public class UserActivity extends AppCompatActivity {
     private TextView txtNomeAluno;
     private CardView cardBoletim;
     private Button btnSair;
-    private ProgressBar progressBar; // Adicionado para feedback de carregamento
+    private ProgressBar progressBar;
 
     private UserViewModel userViewModel;
     private TokenManager tokenManager;
+    private User currentUser;
     private final CompositeDisposable disposables = new CompositeDisposable();
-    private UUID userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,41 +49,19 @@ public class UserActivity extends AppCompatActivity {
         // Hilt irá prover a instância correta do ViewModel
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
-        // Extrai o ID do usuário do Intent
-        if (!getUserIdFromIntent()) {
-            // Se não for possível obter o ID, faz logout.
-            Toast.makeText(this, "Erro: ID de usuário inválido.", Toast.LENGTH_LONG).show();
-            logout();
-            return;
-        }
-
         // Configura os observadores e listeners
         observeUserState();
         setupClickListeners();
 
         // Inicia a busca pelos dados do usuário
-        userViewModel.fetchUserById(userId);
+        userViewModel.fetchMyProfile();
     }
 
     private void initViews() {
         txtNomeAluno = findViewById(R.id.txtNomeAluno);
         cardBoletim = findViewById(R.id.cardBoletim);
         btnSair = findViewById(R.id.btnSair);
-        // Encontre o ProgressBar no seu layout (assumindo que ele exista)
         progressBar = findViewById(R.id.progressBar);
-    }
-
-    private boolean getUserIdFromIntent() {
-        String userIdString = getIntent().getStringExtra("USER_ID_EXTRA");
-        if (userIdString != null && !userIdString.isEmpty()) {
-            try {
-                this.userId = UUID.fromString(userIdString);
-                return true;
-            } catch (IllegalArgumentException e) {
-                return false;
-            }
-        }
-        return false;
     }
 
     /**
@@ -97,12 +73,12 @@ public class UserActivity extends AppCompatActivity {
             setLoading(state instanceof UserViewModel.UserUiState.Loading);
 
             if (state instanceof UserViewModel.UserUiState.Success) {
-                User user = ((UserViewModel.UserUiState.Success) state).user;
-                updateUiWithUserData(user);
+                this.currentUser = ((UserViewModel.UserUiState.Success) state).user;
+                updateUiWithUserData(this.currentUser);
             } else if (state instanceof UserViewModel.UserUiState.Error) {
                 String message = ((UserViewModel.UserUiState.Error) state).message;
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-                logout(); // Se não conseguir carregar dados do usuário, faz logout
+                logout();
             }
         });
     }
@@ -113,14 +89,28 @@ public class UserActivity extends AppCompatActivity {
      * @param user O objeto User recebido do ViewModel.
      */
     private void updateUiWithUserData(User user) {
-        if (user != null) {
-            String welcomeText = "Olá, " + user.getName();
-            txtNomeAluno.setText(welcomeText);
+        if (user == null) return;
+
+        String welcomeText;
+
+        // 1. Verifica de forma segura se o usuário tem o papel "STUDENT"
+        boolean isStudent = user.getRoles() != null && user.getRoles().stream()
+                .anyMatch(role -> "STUDENT".equals(role.getName()));
+
+        // 2. Constrói a string de saudação com base na condição
+        if (isStudent && user.getSeries() != null && !user.getSeries().isEmpty()) {
+            // Formato para estudantes: "Olá, [Nome] - [Série]"
+            welcomeText = "Olá, " + user.getName() + " - " + user.getSeries();
+        } else {
+            // Formato padrão para todos os outros usuários: "Olá, [Nome]"
+            welcomeText = "Olá, " + user.getName();
         }
+
+        // 3. Define o texto no TextView
+        txtNomeAluno.setText(welcomeText);
     }
 
     private void setLoading(boolean isLoading) {
-        // Exibe o ProgressBar e esconde o conteúdo principal enquanto carrega
         if (progressBar != null) {
             progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         }
@@ -130,10 +120,13 @@ public class UserActivity extends AppCompatActivity {
         btnSair.setOnClickListener(v -> logout());
 
         cardBoletim.setOnClickListener(v -> {
-            Intent intent = new Intent(UserActivity.this, GradeActivity.class);
-            // Passa o ID do estudante para a próxima tela
-            intent.putExtra("USER_ID_EXTRA", userId.toString());
-            startActivity(intent);
+            if (currentUser != null) {
+                Intent intent = new Intent(UserActivity.this, GradeActivity.class);
+                intent.putExtra("USER_ID_EXTRA", currentUser.getUserId().toString());
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Aguarde o carregamento dos dados.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

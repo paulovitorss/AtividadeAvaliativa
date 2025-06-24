@@ -27,6 +27,9 @@ public class User {
     @SerializedName("roles")
     private List<Role> roles;
 
+    @SerializedName("series")
+    private String series;
+
     public UUID getUserId() {
         return userId;
     }
@@ -54,5 +57,9 @@ public class User {
 
     public List<Role> getRoles() {
         return roles;
+    }
+
+    public String getSeries() {
+        return series;
     }
 }

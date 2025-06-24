@@ -33,10 +33,9 @@ public class UserRepository {
      * Este metodo retorna o objeto Call, permitindo que a camada que o chama (ViewModel)
      * decida como e quando executar a chamada de forma assíncrona.
      *
-     * @param userId O UUID do usuário a ser buscado.
      * @return Um objeto Call do Retrofit, pronto para ser executado com .enqueue().
      */
-    public Call<User> getUser(UUID userId) {
-        return apiService.getUserById(userId);
+    public Call<User> getMyProfile() {
+        return apiService.getMyProfile();
     }
 }
