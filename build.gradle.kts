@@ -4,6 +4,4 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.hilt.android) apply false
-    alias(libs.plugins.android.test) apply false
-    alias(libs.plugins.baselineprofile) apply false
 }
