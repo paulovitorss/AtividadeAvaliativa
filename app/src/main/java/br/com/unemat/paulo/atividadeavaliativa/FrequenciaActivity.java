@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FrequenciaActivity extends AppCompatActivity {
-    private TextView txtTitulo;
     private RecyclerView recyclerViewFrequencia;
-    private Button btnVoltar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +21,9 @@ public class FrequenciaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_frequencia);
 
         // Inicializar componentes
-        txtTitulo = findViewById(R.id.txtTitulo);
+        TextView txtTitulo = findViewById(R.id.txtTitulo);
         recyclerViewFrequencia = findViewById(R.id.recyclerViewFrequencia);
-        btnVoltar = findViewById(R.id.btnVoltar);
+        Button btnVoltar = findViewById(R.id.btnVoltar);
 
         // Configurar título
         txtTitulo.setText("Frequência Escolar - 2º Bimestre");

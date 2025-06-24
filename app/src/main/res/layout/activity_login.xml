@@ -13,7 +13,7 @@
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_marginTop="48dp"
-        android:contentDescription="@null"
+        android:contentDescription="@string/logo_do_aplicativo"
         android:src="@drawable/ic_school"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

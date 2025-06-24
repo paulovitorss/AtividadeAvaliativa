@@ -80,4 +80,5 @@
     <string name="label_nota_2">"Nota 2: "</string>
     <string name="msg_preencha_campos">Preencha todos os campos</string>
     <string name="perfil">Perfil</string>
+    <string name="logo_do_aplicativo">Icone de capelo</string>
 </resources>

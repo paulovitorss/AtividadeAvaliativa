@@ -50,7 +50,7 @@
         <activity
             android:name=".view.CadastroActivity"
             android:exported="false" />
-        <activity android:name=".PerfilActivity" />
+        <activity android:name=".ui.profile.PerfilActivity" />
         <activity android:name=".view.AdicionarAlunoActivity" />
         <activity android:name=".view.AdicionarResponsavelActivity" />
         <activity

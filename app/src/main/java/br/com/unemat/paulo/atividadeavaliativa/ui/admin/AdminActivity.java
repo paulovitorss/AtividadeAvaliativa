@@ -14,7 +14,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.Objects;
 
 import br.com.unemat.paulo.atividadeavaliativa.EnviarComunicadosActivity;
-import br.com.unemat.paulo.atividadeavaliativa.PerfilActivity;
+import br.com.unemat.paulo.atividadeavaliativa.ui.profile.PerfilActivity;
 import br.com.unemat.paulo.atividadeavaliativa.R;
 import br.com.unemat.paulo.atividadeavaliativa.RelatoriosActivity;
 import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
