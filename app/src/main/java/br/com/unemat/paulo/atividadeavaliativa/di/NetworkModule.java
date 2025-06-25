@@ -43,7 +43,7 @@ public class NetworkModule {
      * caminhos relativos declarados em {@link ApiService}.
      * </p>
      */
-    private static final String BASE_URL = "http://192.168.18.76:8080/";
+    private static final String BASE_URL = "http://10.70.200.122:8080/";
 
     /**
      * Fornece um {@link TokenManager} único para toda a aplicação.
