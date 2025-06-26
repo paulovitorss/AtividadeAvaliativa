@@ -64,7 +64,7 @@
                     android:id="@+id/editTextSearch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Buscar alunos" />
+                    android:hint="@string/buscar_alunos" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -112,7 +112,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="@string/label_adicionar_aluno"
-            android:textColor="@android:color/white"
             app:cornerRadius="8dp"
             app:icon="@drawable/ic_add"
             app:iconGravity="textStart" />
@@ -123,9 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/label_btn_voltar"
-            android:textColor="@color/colorPrimary"
-            app:cornerRadius="8dp"
-            app:strokeColor="@color/colorPrimary" />
+            app:cornerRadius="8dp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

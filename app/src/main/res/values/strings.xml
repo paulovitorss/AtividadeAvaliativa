@@ -81,4 +81,5 @@
     <string name="msg_preencha_campos">Preencha todos os campos</string>
     <string name="perfil">Perfil</string>
     <string name="logo_do_aplicativo">Icone de capelo</string>
+    <string name="buscar_alunos">Buscar alunos</string>
 </resources>
