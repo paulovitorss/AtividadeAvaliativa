@@ -82,4 +82,9 @@
     <string name="perfil">Perfil</string>
     <string name="logo_do_aplicativo">Icone de capelo</string>
     <string name="buscar_alunos">Buscar alunos</string>
+    <string name="info_pessoais">Informações Pessoais</string>
+    <string name="info_academicas">Informações Acadêmicas</string>
+    <string name="info_contato">Informações de Contato</string>
+    <string name="estudantes_vinculados">Estudantes Vinculados:</string>
+    <string name="responsaveis_vinculados">Responsáveis Vinculados:</string>
 </resources>

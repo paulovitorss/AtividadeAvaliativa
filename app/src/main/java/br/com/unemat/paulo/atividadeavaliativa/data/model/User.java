@@ -23,12 +23,23 @@ public class User {
 
     @SerializedName("email")
     private String email;
-
     @SerializedName("roles")
     private List<Role> roles;
 
     @SerializedName("series")
     private String series;
+
+    @SerializedName("registrationNumber")
+    private String registrationNumber;
+
+    @SerializedName("phoneNumber")
+    private String phoneNumber;
+
+    @SerializedName("students")
+    private List<User> students;
+
+    @SerializedName("guardians")
+    private List<GuardianSummary> guardians;
 
     public UUID getUserId() {
         return userId;
@@ -41,7 +52,6 @@ public class User {
     public String getUsername() {
         return username;
     }
-
 
     public String getCpf() {
         return cpf;
@@ -61,5 +71,21 @@ public class User {
 
     public String getSeries() {
         return series;
+    }
+
+    public String getRegistrationNumber() {
+        return registrationNumber;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public List<User> getStudents() {
+        return students;
+    }
+
+    public List<GuardianSummary> getGuardians() {
+        return guardians;
     }
 }

@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
-    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurfaceContainerLowest"
     tools:context=".ui.profile.PerfilActivity">
 
     <ProgressBar
@@ -19,15 +18,12 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_profile_info"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <ScrollView
+        android:id="@+id/content_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        tools:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,54 +31,171 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/label_nome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_nome_completo"
-                android:textAppearance="?attr/textAppearanceLabelMedium"
-                android:textColor="?attr/colorOnSurfaceVariant" />
-
-            <TextView
-                android:id="@+id/txtNome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:drawablePadding="8dp"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="?attr/colorOnSurface"
-                android:textStyle="bold"
-                app:drawableStartCompat="@drawable/ic_person"
-                tools:text="Paulo Vitor Silva" />
-
-            <View
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="wrap_content"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        style="?attr/textAppearanceTitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:text="@string/info_pessoais" />
+
+                    <!-- Campos de usuário -->
+                    <TextView
+                        android:id="@+id/txtNome"
+                        style="@style/ProfileField"
+                        app:drawableStartCompat="@drawable/ic_person"
+                        tools:text="" />
+
+                    <TextView
+                        android:id="@+id/txtEmail"
+                        style="@style/ProfileField"
+                        app:drawableStartCompat="@drawable/ic_email"
+                        tools:text="" />
+
+                    <TextView
+                        android:id="@+id/txtUsername"
+                        style="@style/ProfileField"
+                        app:drawableStartCompat="@drawable/ic_at_symbol"
+                        tools:text="" />
+
+                    <TextView
+                        android:id="@+id/txtCpf"
+                        style="@style/ProfileField"
+                        app:drawableStartCompat="@drawable/ic_card"
+                        tools:text="" />
+
+                    <TextView
+                        android:id="@+id/txtDataNascimento"
+                        style="@style/ProfileField"
+                        app:drawableStartCompat="@drawable/ic_cake"
+                        tools:text="" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_student_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:background="?attr/colorOutlineVariant" />
+                android:visibility="gone"
+                app:cardElevation="2dp"
+                tools:visibility="visible">
 
-            <TextView
-                android:id="@+id/label_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_email"
-                android:textAppearance="?attr/textAppearanceLabelMedium"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-            <TextView
-                android:id="@+id/txtEmail"
-                android:layout_width="wrap_content"
+                    <TextView
+                        style="?attr/textAppearanceTitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:text="@string/info_academicas" />
+
+                    <TextView
+                        android:id="@+id/txtSeries"
+                        style="@style/ProfileField"
+                        app:drawableStartCompat="@drawable/ic_books"
+                        tools:text="" />
+
+                    <TextView
+                        android:id="@+id/txtRegistration"
+                        style="@style/ProfileField"
+                        app:drawableStartCompat="@drawable/ic_id"
+                        tools:text="" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_guardian_info"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:drawablePadding="8dp"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="?attr/colorOnSurface"
-                app:drawableStartCompat="@drawable/ic_email"
-                tools:text="paulo.silva@unemat.br" />
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:cardElevation="2dp"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        style="?attr/textAppearanceTitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:text="@string/info_contato" />
+
+                    <TextView
+                        android:id="@+id/txtPhoneNumber"
+                        style="@style/ProfileField"
+                        app:drawableStartCompat="@drawable/ic_phone"
+                        tools:text="" />
+
+                    <TextView
+                        android:id="@+id/label_students"
+                        style="?attr/textAppearanceTitleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/estudantes_vinculados" />
+
+                    <TextView
+                        android:id="@+id/txtStudentsList"
+                        style="@style/ProfileField"
+                        tools:text="" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_student_guardian_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:cardElevation="2dp"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        style="?attr/textAppearanceTitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:text="@string/responsaveis_vinculados" />
+
+                    <TextView
+                        android:id="@+id/txtGuardiansList"
+                        style="@style/ProfileField"
+                        app:drawableStartCompat="@drawable/ic_person"
+                        tools:text="" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
