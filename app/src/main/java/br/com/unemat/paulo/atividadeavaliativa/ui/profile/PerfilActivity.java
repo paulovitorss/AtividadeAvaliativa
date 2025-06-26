@@ -1,57 +1,76 @@
 package br.com.unemat.paulo.atividadeavaliativa.ui.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.Objects;
-
-import br.com.unemat.paulo.atividadeavaliativa.data.model.User;
-
 import br.com.unemat.paulo.atividadeavaliativa.R;
-
+import br.com.unemat.paulo.atividadeavaliativa.data.model.User;
+import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
+import br.com.unemat.paulo.atividadeavaliativa.ui.auth.LoginActivity;
+import br.com.unemat.paulo.atividadeavaliativa.ui.base.BaseActivity;
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 @AndroidEntryPoint
-public class PerfilActivity extends AppCompatActivity {
-
-    private Toolbar toolbar;
+public class PerfilActivity extends BaseActivity {
     private TextView txtNome, txtEmail;
     private ProgressBar progressBar;
 
     private PerfilViewModel perfilViewModel;
+    private TokenManager tokenManager;
+    private final CompositeDisposable disposables = new CompositeDisposable();
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_perfil;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_perfil);
 
         perfilViewModel = new ViewModelProvider(this).get(PerfilViewModel.class);
+        tokenManager = TokenManager.getInstance(this);
 
         initViews();
-        setupToolbar();
 
         observeProfileState();
     }
 
     private void initViews() {
-        toolbar = findViewById(R.id.toolbarPerfil);
         txtNome = findViewById(R.id.txtNome);
         txtEmail = findViewById(R.id.txtEmail);
         progressBar = findViewById(R.id.progressBar);
     }
 
-    private void setupToolbar() {
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("Meu Perfil");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(v -> finish());
+    @Override
+    protected void logout() {
+        disposables.add(tokenManager.clearToken()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::navigateToLoginScreen)
+        );
+    }
+
+    private void navigateToLoginScreen() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disposables.clear();
     }
 
     private void observeProfileState() {
@@ -81,7 +100,6 @@ public class PerfilActivity extends AppCompatActivity {
             progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         }
 
-        txtNome.setVisibility(isLoading ? View.INVISIBLE : View.VISIBLE);
-        txtEmail.setVisibility(isLoading ? View.INVISIBLE : View.VISIBLE);
+        findViewById(R.id.card_profile_info).setVisibility(isLoading ? View.INVISIBLE : View.VISIBLE);
     }
 }

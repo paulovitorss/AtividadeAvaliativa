@@ -16,7 +16,7 @@
             android:id="@+id/toolbar"
             style="@style/Widget.Material3.Toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="48dp"
             android:background="?attr/colorPrimary"
             android:theme="?attr/actionBarTheme"
             app:navigationIcon="@drawable/ic_menu"
