@@ -31,7 +31,7 @@ public class PerfilViewModel extends ViewModel {
     public void fetchUserProfile() {
         _userUiState.setValue(new UserUiState.Loading());
 
-        userRepository.getMyProfile().enqueue(new Callback<>() {
+        userRepository.getMyProfile().enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {

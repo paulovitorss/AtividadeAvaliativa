@@ -17,6 +17,8 @@ import br.com.unemat.paulo.atividadeavaliativa.data.model.User;
 import br.com.unemat.paulo.atividadeavaliativa.security.TokenManager;
 import br.com.unemat.paulo.atividadeavaliativa.ui.auth.LoginActivity;
 import br.com.unemat.paulo.atividadeavaliativa.ui.base.BaseActivity;
+import br.com.unemat.paulo.atividadeavaliativa.util.DateFormatterUtil;
+import br.com.unemat.paulo.atividadeavaliativa.util.StringFormatterUtil;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -101,8 +103,9 @@ public class PerfilActivity extends BaseActivity {
         txtNome.setText("Nome: " + user.getName());
         txtEmail.setText("Email: " + user.getEmail());
         txtUsername.setText("Usuário: " + user.getUsername());
-        txtCpf.setText("CPF: " + user.getCpf());
-        txtDataNascimento.setText("Nascimento: " + user.getDateOfBirth());
+        txtCpf.setText("CPF: " + StringFormatterUtil.formatCPF(user.getCpf()));
+        String dataFormatada = DateFormatterUtil.toBrazilianFormat(user.getDateOfBirth());
+        txtDataNascimento.setText("Nascimento: " + dataFormatada);
 
         if (user.getSeries() != null) {
             cardStudentInfo.setVisibility(View.VISIBLE);
@@ -114,7 +117,7 @@ public class PerfilActivity extends BaseActivity {
             cardStudentGuardianList.setVisibility(View.VISIBLE);
 
             String guardiansInfo = user.getGuardians().stream()
-                    .map(guardian -> "- " + guardian.getName() + "\n  Telefone: " + (guardian.getPhoneNumber() != null ? guardian.getPhoneNumber() : "Não informado"))
+                    .map(guardian -> "- " + guardian.getName() + "\n  Telefone: " + StringFormatterUtil.formatPhoneNumber(guardian.getPhoneNumber()))
                     .collect(Collectors.joining("\n\n"));
 
             txtGuardiansList.setText(guardiansInfo);
@@ -122,7 +125,7 @@ public class PerfilActivity extends BaseActivity {
 
         if (user.getPhoneNumber() != null) {
             cardGuardianInfo.setVisibility(View.VISIBLE);
-            txtPhoneNumber.setText("Telefone: " + user.getPhoneNumber());
+            txtPhoneNumber.setText("Telefone: " + StringFormatterUtil.formatPhoneNumber(user.getPhoneNumber()));
 
             if (user.getStudents() != null && !user.getStudents().isEmpty()) {
                 String studentsNames = user.getStudents().stream()
