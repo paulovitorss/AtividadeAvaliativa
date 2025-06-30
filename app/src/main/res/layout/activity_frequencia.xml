@@ -4,18 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
+    android:background="?attr/colorSurfaceContainerLowest"
     android:fitsSystemWindows="true"
-    tools:context=".FrequenciaActivity">
+    tools:context=".ui.attendance.AttendanceActivity">
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
+        android:background="?attr/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="@android:color/white">
 
         <TextView
             android:id="@+id/txtTitulo"
@@ -27,6 +39,16 @@
             android:textStyle="bold" />
     </androidx.appcompat.widget.Toolbar>
 
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/content_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:constraint_referenced_ids="cardViewHeader,recyclerViewAttendance,btnVoltar"
+        tools:visibility="visible" />
+
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewHeader"
         android:layout_width="match_parent"
@@ -34,22 +56,21 @@
         android:layout_margin="16dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:text="@string/label_disciplina"
-                android:textColor="@color/colorPrimaryText"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -59,7 +80,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/label_total"
-                android:textColor="@color/colorPrimaryText"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -69,7 +90,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/label_presenca"
-                android:textColor="@color/colorPrimaryText"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -79,15 +100,15 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="%"
-                android:textColor="@color/colorPrimaryText"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewFrequencia"
-        android:layout_width="match_parent"
+        android:id="@+id/recyclerViewAttendance"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
@@ -101,13 +122,12 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnVoltar"
         style="@style/Widget.Material3.Button"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:text="@string/label_btn_voltar"
-        android:textColor="@android:color/white"
-        app:cornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

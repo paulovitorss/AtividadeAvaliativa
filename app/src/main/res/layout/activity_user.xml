@@ -63,7 +63,7 @@
 
             <!-- Card Frequência -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardFrequencia"
+                android:id="@+id/cardAttendance"
                 style="@style/ClickableCard">
 
                 <TextView

@@ -3,6 +3,7 @@ package br.com.unemat.paulo.atividadeavaliativa.data.remote;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.unemat.paulo.atividadeavaliativa.data.model.Attendance;
 import br.com.unemat.paulo.atividadeavaliativa.data.model.CreateGradeRequest;
 import br.com.unemat.paulo.atividadeavaliativa.data.model.Grade;
 import br.com.unemat.paulo.atividadeavaliativa.data.model.LoginRequest;
@@ -36,4 +37,7 @@ public interface ApiService {
 
     @DELETE("/api/v1/grades/{gradeId}")
     Call<Void> deleteGrade(@Path("gradeId") UUID gradeId);
+
+    @GET("/api/v1/attendance-records/student/{studentId}")
+    Call<List<Attendance>> getAttendanceForStudent(@Path("studentId") UUID studentId);
 }

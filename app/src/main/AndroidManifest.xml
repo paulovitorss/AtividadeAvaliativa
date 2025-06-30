@@ -18,7 +18,7 @@
             android:name=".ui.grade.GradeActivity"
             android:exported="false" />
         <activity
-            android:name=".FrequenciaActivity"
+            android:name=".ui.attendance.AttendanceActivity"
             android:exported="false" />
         <activity
             android:name=".DesempenhoActivity"

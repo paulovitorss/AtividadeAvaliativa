@@ -1,56 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="4dp"
-    app:cardElevation="2dp">
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/txtDisciplina"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:layout_weight="2"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="16sp"
+        tools:text="Matemática" />
 
-        <TextView
-            android:id="@+id/txtDisciplina"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="Matemática"
-            android:textColor="@color/colorPrimaryText"
-            android:textSize="14sp" />
+    <TextView
+        android:id="@+id/txtTotalAulas"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="16sp"
+        tools:text="20" />
 
-        <TextView
-            android:id="@+id/txtTotalAulas"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="20"
-            android:textColor="@color/colorPrimaryText"
-            android:textSize="14sp" />
+    <TextView
+        android:id="@+id/txtPresencas"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="16sp"
+        tools:text="18" />
 
-        <TextView
-            android:id="@+id/txtAulasPresentes"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="18"
-            android:textColor="@color/colorPrimaryText"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/txtPorcentagem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="90%"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+    <TextView
+        android:id="@+id/txtPercentual"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:text="90%" />
+</LinearLayout>
