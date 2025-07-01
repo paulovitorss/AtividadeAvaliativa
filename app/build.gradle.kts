@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.symbol.processing)
     alias(libs.plugins.hilt.android)
 }
 
@@ -15,7 +15,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -30,39 +29,55 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 }
 
 dependencies {
+    // Dependências de UI e Core
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    implementation(libs.androidx.cardview)
+
+    // Lifecycle
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
+
+    // Networking
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging.interceptor)
-    implementation(libs.lifecycle.viewmodel)
-    implementation(libs.lifecycle.livedata)
-    implementation(libs.security.crypto)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+
+    // Persistência e Reatividade
     implementation(libs.datastore.preferences.rxjava3)
     implementation(libs.rxjava3.java)
     implementation(libs.rxjava3.android)
+
+    // Segurança e JWT
+    implementation(libs.security.crypto)
     implementation(libs.auth0.jwtdecode)
-    implementation(libs.androidx.cardview)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    // Hilt (usando KSP)
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    ksp(libs.hilt.compiler)
+
+    // Testes
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 }
