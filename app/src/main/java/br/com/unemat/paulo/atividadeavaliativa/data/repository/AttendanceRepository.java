@@ -39,7 +39,11 @@ public class AttendanceRepository {
      * @param studentId O ID do estudante.
      * @return Um objeto Call do Retrofit, pronto para ser executado com .enqueue() no ViewModel.
      */
-    public Call<List<Attendance>> getAttendanceForStudent(UUID studentId) {
-        return apiService.getAttendanceForStudent(studentId);
+    public Call<List<Attendance>> getAttendanceForStudent(UUID studentId, Integer year) {
+        return apiService.getAttendanceForStudent(studentId, year);
+    }
+
+    public Call<List<Integer>> getAttendanceYears(UUID studentId) {
+        return apiService.getAttendanceYears(studentId);
     }
 }

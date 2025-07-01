@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -25,84 +26,92 @@ import retrofit2.Response;
 public class AttendanceViewModel extends ViewModel {
 
     private final AttendanceRepository attendanceRepository;
-
-    private final MutableLiveData<AttendanceUiState> _uiState = new MutableLiveData<>();
-    public final LiveData<AttendanceUiState> uiState = _uiState;
+    private final MutableLiveData<ScreenState> _uiState = new MutableLiveData<>();
+    public final LiveData<ScreenState> uiState = _uiState;
 
     @Inject
     public AttendanceViewModel(AttendanceRepository attendanceRepository) {
         this.attendanceRepository = attendanceRepository;
     }
 
-    public void fetchAttendance(UUID studentId) {
-        _uiState.setValue(new AttendanceUiState.Loading());
+    public void fetchAvailableYears(UUID studentId) {
+        _uiState.setValue(new ScreenState(true, false, Collections.emptyList(), null, null));
 
-        attendanceRepository.getAttendanceForStudent(studentId).enqueue(new Callback<List<Attendance>>() {
+        attendanceRepository.getAttendanceYears(studentId).enqueue(new Callback<List<Integer>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Integer>> call, @NonNull Response<List<Integer>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Integer> years = response.body();
+                    if (!years.isEmpty()) {
+                        fetchAttendanceForYear(studentId, years.get(0), years);
+                    } else {
+                        _uiState.postValue(new ScreenState(false, false, Collections.emptyList(), Collections.emptyList(), null));
+                    }
+                } else {
+                    _uiState.postValue(new ScreenState(false, false, null, null, "Falha ao buscar anos disponíveis."));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Integer>> call, @NonNull Throwable t) {
+                _uiState.postValue(new ScreenState(false, false, null, null, "Erro de conexão ao buscar anos."));
+            }
+        });
+    }
+
+    public void fetchAttendanceForYear(UUID studentId, Integer year, List<Integer> availableYears) {
+        _uiState.setValue(new ScreenState(false, true, availableYears, null, null));
+
+        attendanceRepository.getAttendanceForStudent(studentId, year).enqueue(new Callback<List<Attendance>>() {
             @Override
             public void onResponse(@NonNull Call<List<Attendance>> call, @NonNull Response<List<Attendance>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<AttendanceSummary> summaryList = processAttendances(response.body());
-                    _uiState.postValue(new AttendanceUiState.Success(summaryList));
+                    _uiState.postValue(new ScreenState(false, false, availableYears, summaryList, null));
                 } else {
-                    _uiState.postValue(new AttendanceUiState.Error("Falha ao carregar frequências."));
+                    _uiState.postValue(new ScreenState(false, false, availableYears, null, "Falha ao carregar frequências."));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Attendance>> call, @NonNull Throwable t) {
-                _uiState.postValue(new AttendanceUiState.Error("Erro de conexão."));
+                _uiState.postValue(new ScreenState(false, false, availableYears, null, "Erro de conexão."));
             }
         });
     }
 
     private List<AttendanceSummary> processAttendances(List<Attendance> records) {
-        if (records == null || records.isEmpty()) {
-            return new ArrayList<>();
-        }
-
+        if (records == null || records.isEmpty()) return new ArrayList<>();
         Map<UUID, List<Attendance>> recordsBySubject = records.stream()
                 .filter(r -> r.getSubject() != null)
                 .collect(Collectors.groupingBy(record -> record.getSubject().getSubjectId()));
-
         List<AttendanceSummary> summaries = new ArrayList<>();
         for (List<Attendance> subjectRecords : recordsBySubject.values()) {
             if (subjectRecords.isEmpty()) continue;
-
             String subjectName = subjectRecords.get(0).getSubject().getName();
             AttendanceSummary summary = new AttendanceSummary(subjectName);
-
             for (Attendance record : subjectRecords) {
                 summary.incrementTotal();
-                if ("PRESENT".equalsIgnoreCase(record.getStatus())) {
-                    summary.incrementPresence();
-                }
+                if ("PRESENT".equalsIgnoreCase(record.getStatus())) summary.incrementPresence();
             }
             summaries.add(summary);
         }
         return summaries;
     }
 
-    public static abstract class AttendanceUiState {
-        private AttendanceUiState() {
-        }
+    public static class ScreenState {
+        public final boolean isLoadingInitial;
+        public final boolean isLoadingSummaries;
+        public final List<Integer> availableYears;
+        public final List<AttendanceSummary> attendanceSummaries;
+        public final String error;
 
-        public static final class Loading extends AttendanceUiState {
-        }
-
-        public static final class Success extends AttendanceUiState {
-            public final List<AttendanceSummary> summaries;
-
-            public Success(List<AttendanceSummary> summaries) {
-                this.summaries = summaries;
-            }
-        }
-
-        public static final class Error extends AttendanceUiState {
-            public final String message;
-
-            public Error(String message) {
-                this.message = message;
-            }
+        public ScreenState(boolean isLoadingInitial, boolean isLoadingSummaries, List<Integer> availableYears, List<AttendanceSummary> attendanceSummaries, String error) {
+            this.isLoadingInitial = isLoadingInitial;
+            this.isLoadingSummaries = isLoadingSummaries;
+            this.availableYears = availableYears;
+            this.attendanceSummaries = attendanceSummaries;
+            this.error = error;
         }
     }
 }

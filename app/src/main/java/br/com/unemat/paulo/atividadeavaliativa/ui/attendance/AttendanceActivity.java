@@ -4,7 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.Objects;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import br.com.unemat.paulo.atividadeavaliativa.R;
@@ -24,12 +27,15 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class AttendanceActivity extends AppCompatActivity {
 
     public static final String EXTRA_STUDENT_ID = "EXTRA_STUDENT_ID";
-
     private AttendanceViewModel viewModel;
     private AttendanceAdapter frequenciaAdapter;
     private RecyclerView recyclerViewAttendance;
     private ProgressBar progressBar;
     private Group contentGroup;
+    private Spinner spinnerYear;
+    private ArrayAdapter<Integer> spinnerAdapter;
+    private UUID studentId;
+    private boolean isUserInteraction = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +43,15 @@ public class AttendanceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_frequencia);
 
         viewModel = new ViewModelProvider(this).get(AttendanceViewModel.class);
+        studentId = (UUID) getIntent().getSerializableExtra(EXTRA_STUDENT_ID);
 
         initViews();
         setupRecyclerView();
+        setupYearSpinner();
         observeViewModel();
 
-        UUID studentId = (UUID) getIntent().getSerializableExtra(EXTRA_STUDENT_ID);
         if (studentId != null) {
-            viewModel.fetchAttendance(studentId);
+            viewModel.fetchAvailableYears(studentId);
         } else {
             Toast.makeText(this, "ID do estudante não fornecido.", Toast.LENGTH_LONG).show();
             finish();
@@ -54,14 +61,16 @@ public class AttendanceActivity extends AppCompatActivity {
     private void initViews() {
         progressBar = findViewById(R.id.progressBar);
         contentGroup = findViewById(R.id.content_group);
-
+        spinnerYear = findViewById(R.id.spinnerYear);
         recyclerViewAttendance = findViewById(R.id.recyclerViewAttendance);
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 
@@ -71,20 +80,51 @@ public class AttendanceActivity extends AppCompatActivity {
         recyclerViewAttendance.setAdapter(frequenciaAdapter);
     }
 
-    private void setLoading(boolean isLoading) {
-        progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        contentGroup.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+    private void setupYearSpinner() {
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerYear.setAdapter(spinnerAdapter);
+
+        spinnerYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!isUserInteraction) return;
+
+                Integer selectedYear = (Integer) parent.getItemAtPosition(position);
+                AttendanceViewModel.ScreenState currentState = viewModel.uiState.getValue();
+
+                if (studentId != null && currentState != null && currentState.availableYears != null) {
+                    viewModel.fetchAttendanceForYear(studentId, selectedYear, currentState.availableYears);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     private void observeViewModel() {
         viewModel.uiState.observe(this, state -> {
-            setLoading(state instanceof AttendanceViewModel.AttendanceUiState.Loading);
+            progressBar.setVisibility(state.isLoadingInitial || state.isLoadingSummaries ? View.VISIBLE : View.GONE);
+            contentGroup.setVisibility(state.isLoadingInitial ? View.GONE : View.VISIBLE);
+            recyclerViewAttendance.setVisibility(state.isLoadingSummaries ? View.INVISIBLE : View.VISIBLE);
 
-            if (state instanceof AttendanceViewModel.AttendanceUiState.Success) {
-                frequenciaAdapter.submitList(((AttendanceViewModel.AttendanceUiState.Success) state).summaries);
-            } else if (state instanceof AttendanceViewModel.AttendanceUiState.Error) {
-                String errorMessage = ((AttendanceViewModel.AttendanceUiState.Error) state).message;
-                Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+            if (state.availableYears != null && spinnerAdapter.getCount() == 0 && !state.availableYears.isEmpty()) {
+                isUserInteraction = false;
+                spinnerAdapter.clear();
+                spinnerAdapter.addAll(state.availableYears);
+                spinnerAdapter.notifyDataSetChanged();
+                isUserInteraction = true;
+            }
+            spinnerYear.setVisibility(state.availableYears != null && !state.availableYears.isEmpty() ? View.VISIBLE : View.GONE);
+
+            if (state.attendanceSummaries != null) {
+                frequenciaAdapter.submitList(state.attendanceSummaries);
+            }
+
+            if (state.error != null) {
+                Toast.makeText(this, state.error, Toast.LENGTH_LONG).show();
             }
         });
     }

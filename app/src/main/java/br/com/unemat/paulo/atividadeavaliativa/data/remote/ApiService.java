@@ -17,6 +17,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
     @Public
@@ -38,6 +39,13 @@ public interface ApiService {
     @DELETE("/api/v1/grades/{gradeId}")
     Call<Void> deleteGrade(@Path("gradeId") UUID gradeId);
 
+
     @GET("/api/v1/attendance-records/student/{studentId}")
-    Call<List<Attendance>> getAttendanceForStudent(@Path("studentId") UUID studentId);
+    Call<List<Attendance>> getAttendanceForStudent(
+            @Path("studentId") UUID studentId,
+            @Query("year") Integer year
+    );
+
+    @GET("/api/v1/attendance-records/student/{studentId}/years")
+    Call<List<Integer>> getAttendanceYears(@Path("studentId") UUID studentId);
 }
