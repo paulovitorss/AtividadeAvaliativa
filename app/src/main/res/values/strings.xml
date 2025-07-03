@@ -87,4 +87,10 @@
     <string name="info_contato">Informações de Contato</string>
     <string name="estudantes_vinculados">Estudantes Vinculados:</string>
     <string name="responsaveis_vinculados">Responsáveis Vinculados:</string>
+    <string name="label_ano">Ano</string>
+    <string name="header_disciplina">Disciplina</string>
+    <string name="header_total">Total</string>
+    <string name="header_presencas">Presenças</string>
+    <string name="header_percentual">%</string>
+    <string name="error_student_id_not_provided">ID do estudante não fornecido.</string>
 </resources>

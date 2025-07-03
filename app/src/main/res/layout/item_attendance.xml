@@ -1,0 +1,11 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
+
+    <include
+        android:id="@+id/attendance_row"
+        layout="@layout/layout_attendance_row" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

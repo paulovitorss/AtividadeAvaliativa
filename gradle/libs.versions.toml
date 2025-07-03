@@ -4,6 +4,7 @@ kotlin = "2.2.0"
 ksp = "2.2.0-2.0.2"
 hilt = "2.56.2"
 retrofit = "3.0.0"
+recyclerview = "1.4.0"
 okhttpLogging = "4.12.0"
 material = "1.12.0"
 appcompat = "1.7.1"
@@ -27,10 +28,13 @@ espresso-core = "3.6.1"
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-cardview = { group = "androidx.cardview", name = "cardview", version.ref = "androidx-cardview" }
 security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
+
 desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar-jdk-libs" }
+
 
 # --- Lifecycle ---
 lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx" }

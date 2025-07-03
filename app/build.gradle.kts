@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.androidx.cardview)
+    implementation(libs.recyclerview)
 
     // Lifecycle
     implementation(libs.lifecycle.viewmodel)

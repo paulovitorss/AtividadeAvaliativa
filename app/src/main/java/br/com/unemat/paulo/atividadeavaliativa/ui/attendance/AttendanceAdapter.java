@@ -1,17 +1,15 @@
 package br.com.unemat.paulo.atividadeavaliativa.ui.attendance;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import br.com.unemat.paulo.atividadeavaliativa.R;
 import br.com.unemat.paulo.atividadeavaliativa.data.model.AttendanceSummary;
+import br.com.unemat.paulo.atividadeavaliativa.databinding.ItemAttendanceBinding;
 
 public class AttendanceAdapter extends ListAdapter<AttendanceSummary, AttendanceAdapter.AttendanceViewHolder> {
 
@@ -22,47 +20,44 @@ public class AttendanceAdapter extends ListAdapter<AttendanceSummary, Attendance
     @NonNull
     @Override
     public AttendanceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_frequencia, parent, false);
-        return new AttendanceViewHolder(view);
+        ItemAttendanceBinding binding = ItemAttendanceBinding.inflate(
+                LayoutInflater.from(parent.getContext()),
+                parent,
+                false
+        );
+        return new AttendanceViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull AttendanceViewHolder holder, int position) {
-        AttendanceSummary summary = getItem(position);
-        holder.bind(summary);
+        holder.bind(getItem(position));
     }
 
-    static class AttendanceViewHolder extends RecyclerView.ViewHolder {
-        private final TextView txtDisciplina;
-        private final TextView txtTotalAulas;
-        private final TextView txtPresencas;
-        private final TextView txtPercentual;
+    public static class AttendanceViewHolder extends RecyclerView.ViewHolder {
+        private final ItemAttendanceBinding binding;
 
-        public AttendanceViewHolder(@NonNull View itemView) {
-            super(itemView);
-            txtDisciplina = itemView.findViewById(R.id.txtDisciplina);
-            txtTotalAulas = itemView.findViewById(R.id.txtTotalAulas);
-            txtPresencas = itemView.findViewById(R.id.txtPresencas);
-            txtPercentual = itemView.findViewById(R.id.txtPercentual);
+        public AttendanceViewHolder(ItemAttendanceBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
         public void bind(AttendanceSummary summary) {
-            txtDisciplina.setText(summary.getSubjectName());
-            txtTotalAulas.setText(String.valueOf(summary.getTotalClasses()));
-            txtPresencas.setText(String.valueOf(summary.getPresentClasses()));
-            txtPercentual.setText(summary.getFormattedPercentage() + "%");
+            binding.attendanceRow.txtDisciplina.setText(summary.subjectName());
+            binding.attendanceRow.txtTotalAulas.setText(String.valueOf(summary.totalClasses()));
+            binding.attendanceRow.txtPresencas.setText(String.valueOf(summary.presentClasses()));
+            binding.attendanceRow.txtPercentual.setText(summary.getFormattedPercentage());
         }
     }
 
-    private static final DiffUtil.ItemCallback<AttendanceSummary> DIFF_CALLBACK = new DiffUtil.ItemCallback<AttendanceSummary>() {
+    private static final DiffUtil.ItemCallback<AttendanceSummary> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areItemsTheSame(@NonNull AttendanceSummary oldItem, @NonNull AttendanceSummary newItem) {
-            return oldItem.getSubjectName().equals(newItem.getSubjectName());
+            return oldItem.subjectName().equals(newItem.subjectName());
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull AttendanceSummary oldItem, @NonNull AttendanceSummary newItem) {
-            return oldItem.getTotalClasses() == newItem.getTotalClasses() && oldItem.getPresentClasses() == newItem.getPresentClasses();
+            return oldItem.equals(newItem);
         }
     };
 }
